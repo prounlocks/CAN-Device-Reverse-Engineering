@@ -50,13 +50,13 @@ for byte1 in byte1_range:
                     # If you need delay, uncomment next string, setting in seconds.
                     #time.sleep(0.01)
 
-                    # Optionally check for any received message
+                    # Optionally check for any received message and stop if device responded
                     # received_msg = bus.recv(timeout=0.001)
                     # if received_msg:
                     #     print("Received message - ID: {:08X} Data: {}".format(received_msg.arbitration_id, ' '.join(format(x, '02x') for x in received_msg.data)))
                     #     break
 
-                # Optional delay to avoid flooding the bus
+                
 
 
 # Close the CAN bus interface
