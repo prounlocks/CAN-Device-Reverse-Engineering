@@ -35,7 +35,7 @@ for byte1 in byte1_range:
         for byte3 in byte3_range:
             for byte4 in byte4_range:
                 # Define the data to send
-                data_to_send = [byte1, byte2, byte3, byte4] + [0x10] * 1  # Remaining bytes fixed as 0x30
+                data_to_send = [byte1, byte2, byte3, byte4]
 
                 # Scan through the address range and send the data
                 for device_id in range(start_address, end_address + 1):
@@ -46,7 +46,10 @@ for byte1 in byte1_range:
                         print("Message sent - ID: {:08X} Data: {}".format(device_id, ' '.join(format(x, '02x') for x in data_to_send)))
                     except can.CanError:
                         print("Error sending message")
-                    #time.sleep(0.0001)
+
+                    # If you need delay, uncomment next string, setting in seconds.
+                    #time.sleep(0.01)
+
                     # Optionally check for any received message
                     # received_msg = bus.recv(timeout=0.001)
                     # if received_msg:
