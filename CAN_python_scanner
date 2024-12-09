@@ -1,0 +1,60 @@
+####CAN PYTHON SCANNER for REVERSE ENGINEERING by Prounlocks####
+
+import can
+import time
+
+# Function to get user input for a byte range
+def get_byte_range(byte_position):
+    while True:
+        try:
+            start = int(input(f"Enter the start value for byte {byte_position} (0-255): "))
+            end = int(input(f"Enter the end value for byte {byte_position} (0-255): "))
+            if 0 <= start <= 255 and 0 <= end <= 255 and start <= end:
+                return range(start, end + 1)
+            else:
+                print("Please enter valid start and end values between 0 and 255, with start <= end.")
+        except ValueError:
+            print("Invalid input. Please enter numeric values.")
+
+# Create a CAN bus interface
+bus = can.interface.Bus(interface='slcan', channel='COM5', bitrate=250000)
+
+# Define the address range for scanning
+start_address = 0x0000
+end_address = 0x2fff
+
+# Get byte ranges from user
+byte1_range = get_byte_range(1)
+byte2_range = get_byte_range(2)
+byte3_range = get_byte_range(3)
+byte4_range = get_byte_range(4)
+
+# Iterate over the specified ranges and send messages
+for byte1 in byte1_range:
+    for byte2 in byte2_range:
+        for byte3 in byte3_range:
+            for byte4 in byte4_range:
+                # Define the data to send
+                data_to_send = [byte1, byte2, byte3, byte4] + [0x10] * 1  # Remaining bytes fixed as 0x30
+
+                # Scan through the address range and send the data
+                for device_id in range(start_address, end_address + 1):
+                    msg = can.Message(arbitration_id=device_id, data=data_to_send, is_extended_id=True)
+                    
+                    try:
+                        bus.send(msg)
+                        print("Message sent - ID: {:08X} Data: {}".format(device_id, ' '.join(format(x, '02x') for x in data_to_send)))
+                    except can.CanError:
+                        print("Error sending message")
+                    #time.sleep(0.0001)
+                    # Optionally check for any received message
+                    # received_msg = bus.recv(timeout=0.001)
+                    # if received_msg:
+                    #     print("Received message - ID: {:08X} Data: {}".format(received_msg.arbitration_id, ' '.join(format(x, '02x') for x in received_msg.data)))
+                    #     break
+
+                # Optional delay to avoid flooding the bus
+
+
+# Close the CAN bus interface
+bus.shutdown()
